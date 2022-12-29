@@ -1,0 +1,36 @@
+@page "/Planets"
+
+@using System.Net.Http.Json
+@using Models
+
+@inject HttpClient httpClient
+
+
+<PageTitle>Star Wars Planets</PageTitle>
+
+<h1>Planets</h1>
+
+<MudTable Items="@PlanetList.Take(10)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading"
+    LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<MudSwitch @bind-Checked="_hidePosition">Hide <b>position</b> when Breakpoint=Xs</MudSwitch>
+<MudSwitch @bind-Checked="_loading">Show Loading</MudSwitch>
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Planet> PlanetList = new List<Planet>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var planetResponse = await httpClient.GetFromJsonAsync<PlanetResponse>("https://swapi.dev/api/planets");
+        PlanetList = planetResponse?.Results ?? new List<Planet>();
+    }
+
+}
